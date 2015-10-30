@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+							http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="pooledConnection" class="com.mifi.flow.mq.MQConnectionFactoryBean">
+		<property name="host" value="127.0.0.1"/>
+		<property name="port" value="61616"/>
+		<property name="username" value="admin"/>
+		<property name="password" value=""/>
+	</bean>
+	
+	<bean id="mqCode" class="com.mifi.flow.mq.MQCode">
+		<property name="_pooledConnection" ref="pooledConnection"/>
+		<property name="_brokens">
+			<map>
+				<entry key="ap_flow_appear" value="false"/>
+			</map>
+		</property>
+	</bean>
+</beans>
