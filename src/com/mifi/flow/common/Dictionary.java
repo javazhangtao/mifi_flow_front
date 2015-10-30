@@ -10,8 +10,10 @@ public class Dictionary {
 	final static PropertiesUtil propertiesUtil=new PropertiesUtil("/config.properties");
 	
 	public final static Integer CODE_PARAM_NULL =101;//参数为空
+	public final static Integer CODE_PARAM_ILLEGAL =102;//参数不合法
 	public final static Integer CODE_RESOURCE_NOT_FOUNT =104;//资源不存在
 	public final static Integer CODE_SYSTEM_ERROT =500;//系统错误
+	public final static Integer CODE_SUCCESS =200;//成功
 	
 	
 	public final static Integer STATUS_NORMAL=1;//数据库状态   正常

@@ -7,7 +7,6 @@ import javax.net.ssl.SSLException;
 import org.apache.log4j.Logger;
 
 import com.mifi.flow.common.Dictionary;
-import com.mifi.flow.utils.PropertiesUtil;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

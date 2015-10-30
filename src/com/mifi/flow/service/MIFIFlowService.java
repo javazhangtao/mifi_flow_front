@@ -1,6 +1,8 @@
 package com.mifi.flow.service;
 
+import com.mifi.flow.entity.ResponceInfo;
+
 public interface MIFIFlowService {
 	
-	void flowAppear(String datas,String ntime , String apMac) throws Exception;
+	ResponceInfo flowAppear(String datas,String ntime , String apMac);
 }

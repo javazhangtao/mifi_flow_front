@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
@@ -14,17 +13,20 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.pool.PooledConnection;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class MQCode implements InitializingBean{
 	
+	@Autowired
 	PooledConnection _pooledConnection;
 	private Session session ;
 	
 	Map<String, Boolean> _brokens; //队列   名称， 是否持久化    是：TOPIC     否：QUEUE
 	
-	public Map<String, MessageProducer> producers=new ConcurrentHashMap<String, MessageProducer>();
-	public Map<String, MessageConsumer> consumers=new ConcurrentHashMap<String, MessageConsumer>();
+	public Map<String, Destination> destinations=new ConcurrentHashMap<String, Destination>();//对应队列名   key:队列名_TOPIC/队列名_QUEUE
+	
+	public Map<String, MessageProducer> producers=new ConcurrentHashMap<String, MessageProducer>();//对应队列名   
+	public Map<String, MessageConsumer> consumers=new ConcurrentHashMap<String, MessageConsumer>();//对应队列名   
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -32,51 +34,14 @@ public class MQCode implements InitializingBean{
 			throw new IllegalAccessError(" _pooledConnection IS NULL ");
 		for (Entry<String, Boolean> e:_brokens.entrySet()) {
 			setSession(_pooledConnection.getConnection().createSession(false, Session.AUTO_ACKNOWLEDGE));
-			if(e.getValue())
-				_createProducer(e.getKey());
-			else
-				_createConsumer(e.getKey());
+			Destination dest=(e.getValue())?new ActiveMQTopic(e.getKey()):new ActiveMQQueue(e.getKey());
+			if(null!=dest)
+				destinations.put(e.getKey().concat((e.getValue())?"_TOPIC":"_QUEUE"), dest);
 		}
 	}
 	
 	
-	void _createProducer(String name) throws Exception{
-		if(StringUtils.hasText(name)){
-			if(!getProducers().containsKey(name)){
-				Destination dest = new ActiveMQTopic(name);
-				MessageProducer producer=getSession().createProducer(dest);
-				producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-				synchronized(getProducers()){
-					getProducers().put(name, producer);
-				}
-			}
-		}else{
-			throw new NullPointerException(" TOPIC NAME IS NULL ");
-		}
-	}
 	
-	
-	void _createConsumer(String name) throws Exception{
-		if(StringUtils.hasText(name)){
-			if(!getConsumers().containsKey(name)){
-				Destination dest = new ActiveMQQueue(name);
-				synchronized(getConsumers()){
-					getConsumers().put(name, getSession().createConsumer(dest));
-				}
-			}
-		}else{
-			throw new NullPointerException(" QUEUE NAME IS NULL ");
-		}
-	}
-	
-	public PooledConnection get_pooledConnection() {
-		return _pooledConnection;
-	}
-
-	public void set_pooledConnection(PooledConnection _pooledConnection) {
-		this._pooledConnection = _pooledConnection;
-	}
-
 	public Map<String, Boolean> get_brokens() {
 		return _brokens;
 	}
@@ -95,10 +60,20 @@ public class MQCode implements InitializingBean{
 		this.session = session;
 	}
 
+	public Map<String, Destination> getDestinations() {
+		return destinations;
+	}
+
+	public void setDestinations(Map<String, Destination> destinations) {
+		this.destinations = destinations;
+	}
+
+
 
 	public Map<String, MessageProducer> getProducers() {
 		return producers;
 	}
+
 
 
 	public void setProducers(Map<String, MessageProducer> producers) {
@@ -106,16 +81,14 @@ public class MQCode implements InitializingBean{
 	}
 
 
+
 	public Map<String, MessageConsumer> getConsumers() {
 		return consumers;
 	}
 
 
+
 	public void setConsumers(Map<String, MessageConsumer> consumers) {
 		this.consumers = consumers;
 	}
-	
-	
-	
-
 }

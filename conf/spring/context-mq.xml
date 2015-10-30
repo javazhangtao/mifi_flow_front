@@ -13,7 +13,6 @@
 	</bean>
 	
 	<bean id="mqCode" class="com.mifi.flow.mq.MQCode">
-		<property name="_pooledConnection" ref="pooledConnection"/>
 		<property name="_brokens">
 			<map>
 				<entry key="ap_flow_appear" value="false"/>
